@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 
-function StarRating({ maxRating = 10, color = "#fcc419", size = 48 }) {
+function StarRating({
+  maxRating = 10,
+  color = "#fcc419",
+  size = 48,
+  onSetRating,
+}) {
   const [rating, setRating] = useState(0);
   const [tempRating, setTempRating] = useState(0);
 
@@ -24,6 +29,7 @@ function StarRating({ maxRating = 10, color = "#fcc419", size = 48 }) {
 
   function handleRate(value) {
     setRating(value);
+    if (onSetRating) onSetRating(value);
   }
 
   return (
