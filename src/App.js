@@ -27,28 +27,38 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
-  // fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`)
-  //   .then((res) => res.json())
-  //   .then((data) => {
-  //     console.log(data);
-  //     setMovies(data.Search);
-  //   });
+  useEffect(function () {
+    function callback(e) {
+      if (e.key === "Escape") {
+        handleCloseMovie();
+      }
+    }
+    document.addEventListener("keydown", callback);
+    return function () {
+      document.removeEventListener("keydown", callback);
+    };
+  }, []);
 
   useEffect(
     function () {
+      const controller = new AbortController();
+
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
           if (!res.ok) throw new Error("Something went wrong fetching movies");
           const data = await res.json();
           if (data.Response === "False")
             throw new Error("Error fetching movies");
           setMovies(data.Search);
+          setError("");
         } catch (err) {
+          if (err.name === "AbortError") return;
           setError(err.message);
         } finally {
           setIsLoading(false);
@@ -59,7 +69,11 @@ export default function App() {
         setError("");
         return;
       }
+      handleCloseMovie();
       fetchMovies();
+      return function () {
+        controller.abort();
+      };
     },
     [query]
   );
@@ -285,6 +299,18 @@ function MoviesDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
       fetchMovieDetails();
     },
     [selectedId]
+  );
+
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `${title} | usePopcorn`;
+
+      return function () {
+        document.title = "usePopcorn";
+      };
+    },
+    [title]
   );
 
   return (
