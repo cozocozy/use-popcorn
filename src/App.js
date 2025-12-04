@@ -8,11 +8,16 @@ const KEY = "862aa2ad";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+
+  // const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(function () {
+    const storedWatchedMovies = localStorage.getItem("watched");
+    return JSON.parse(storedWatchedMovies) || [];
+  });
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (selectedId === id ? null : id));
@@ -23,10 +28,18 @@ export default function App() {
   }
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   }
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
+
   useEffect(function () {
     function callback(e) {
       if (e.key === "Escape") {
@@ -218,9 +231,15 @@ function Movie({ onSelectMovie, movie }) {
 }
 
 function WatchSummary({ watched }) {
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
-  const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
+  const avgImdbRating = Number(
+    average(watched.map((movie) => movie.imdbRating))
+  ).toFixed(2);
+  const avgUserRating = Number(
+    average(watched.map((movie) => movie.userRating))
+  ).toFixed(2);
+  const avgRuntime = Number(
+    average(watched.map((movie) => movie.runtime)).toFixed(2)
+  );
   return (
     <div className="summary">
       <h2>Movies you watched</h2>
@@ -231,11 +250,11 @@ function WatchSummary({ watched }) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating.toFixed(2)}</span>
+          <span>{avgImdbRating}</span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating.toFixed(2)}</span>
+          <span>{avgUserRating}</span>
         </p>
         <p>
           <span>⏳</span>
