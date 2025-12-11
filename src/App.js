@@ -1,19 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
+import { useMovies } from "./useMovies";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-const KEY = "862aa2ad";
-
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
 
-  // const [watched, setWatched] = useState([]);
   const [watched, setWatched] = useState(function () {
     const storedWatchedMovies = localStorage.getItem("watched");
     return JSON.parse(storedWatchedMovies) || [];
@@ -50,45 +46,6 @@ export default function App() {
       document.removeEventListener("keydown", callback);
     };
   }, []);
-
-  useEffect(
-    function () {
-      const controller = new AbortController();
-
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError("");
-          const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal: controller.signal }
-          );
-          if (!res.ok) throw new Error("Something went wrong fetching movies");
-          const data = await res.json();
-          if (data.Response === "False")
-            throw new Error("Error fetching movies");
-          setMovies(data.Search);
-          setError("");
-        } catch (err) {
-          if (err.name === "AbortError") return;
-          setError(err.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
-      handleCloseMovie();
-      fetchMovies();
-      return function () {
-        controller.abort();
-      };
-    },
-    [query]
-  );
 
   return (
     <>
@@ -225,15 +182,14 @@ function Movie({ onSelectMovie, movie }) {
 }
 
 function WatchSummary({ watched }) {
-  const avgImdbRating = Number(
-    average(watched.map((movie) => movie.imdbRating))
-  ).toFixed(2);
-  const avgUserRating = Number(
-    average(watched.map((movie) => movie.userRating))
-  ).toFixed(2);
-  const avgRuntime = Number(
-    average(watched.map((movie) => movie.runtime)).toFixed(2)
-  );
+  const imdbRatings = watched.map((m) => m.imdbRating);
+  const userRatings = watched.map((m) => m.userRating);
+  const runtimes = watched.map((m) => m.runtime);
+
+  const avgImdbRating = average(imdbRatings);
+  const avgUserRating = average(userRatings);
+  const avgRuntime = average(runtimes);
+
   return (
     <div className="summary">
       <h2>Movies you watched</h2>
@@ -242,17 +198,20 @@ function WatchSummary({ watched }) {
           <span>#️⃣</span>
           <span>{watched.length} movies</span>
         </p>
+
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>{avgImdbRating.toFixed(1)}</span>
         </p>
+
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(1)}</span>
         </p>
+
         <p>
           <span>⏳</span>
-          <span>{avgRuntime} min</span>
+          <span>{avgRuntime.toFixed(0)} min</span>
         </p>
       </div>
     </div>
@@ -306,6 +265,8 @@ function MoviesDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   useEffect(
     function () {
       async function fetchMovieDetails() {
+        const KEY = "862aa2ad";
+
         try {
           setIsLoading(true);
           const res = await fetch(
@@ -433,29 +394,6 @@ function WatchedMovieList({ watched, onDeleteWatch }) {
     </ul>
   );
 }
-// function WatchedMovie({ movie }) {
-//   return (
-//     <li key={movie.imdbID}>
-//       <img src={movie.Poster} alt={`${movie.title} poster`} />
-//       <h3>{movie.title}</h3>
-//       <div>
-//         <p>
-//           <span>⭐️</span>
-//           <span>{movie.imdbRating}</span>
-//         </p>
-//         <p>
-//           <span>🌟</span>
-//           <span>{movie.userRating}</span>
-//         </p>
-//         <p>
-//           <span>⏳</span>
-//           <span>{movie.runtime} min</span>
-//         </p>
-//       </div>
-//     </li>
-//   );
-// }
-
 function Loader() {
   return <p className="loader">Loading...</p>;
 }
