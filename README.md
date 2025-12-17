@@ -1,70 +1,165 @@
-# Getting Started with Create React App
+# Use-Popcorn
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Use-Popcorn is an internal frontend React application built to practice and demonstrate core React concepts such as state management, hooks, side effects, API fetching, and browser storage.
 
-## Available Scripts
+This project focuses on real-world React patterns rather than production-ready architecture and is intended for internal learning and development purposes.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 1. Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React.js
+- JavaScript (ES6+)
+- Create React App
+- Node.js and npm
+- OMDb API (external movie data source)
+- Browser LocalStorage
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 2. Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2.1 Prerequisites
 
-### `npm run build`
+- Node.js (v14 or higher recommended)
+- npm
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 2.2 Setup
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clone the repository
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+git clone https://github.com/cozocozy/use-popcorn.git
+cd use-popcorn
 
-### `npm run eject`
+Install dependencies
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+npm install
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Run the development server
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+npm start
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Open the application in your browser
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+http://localhost:3000
 
-### Code Splitting
+3. Project Structure
+use-popcorn/
+├── public/                 Static public assets
+├── src/
+│   ├── components/         Reusable UI components
+│   ├── App.js              Main application logic
+│   ├── index.js            Application entry point
+│   └── index.css           Global styles
+├── package.json
+└── README.md
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+4. Features and Implementation
 
-### Analyzing the Bundle Size
+4.1 Movie Fetching using OMDb API
+Movie data is fetched dynamically from the OMDb API
+Fetching is triggered when the search query changes
+Side effects are handled using useEffect
+Asynchronous logic is implemented using async and await
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Concepts used:
+useEffect
+API fetching
+Side-effect management
 
-### Making a Progressive Web App
+4.2 Loading State Handling
+A loading indicator is displayed while data is being fetched
+Prevents empty or flickering UI
+Improves user experience during API requests
+Implementation detail:
+An isLoading state is set before and after fetch execution
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+4.3 error Handling
+Handles API and network errors gracefully
+Prevents application crashes
+Error messages are conditionally rendered
 
-### Advanced Configuration
+4.4 Watchlist Management
+Users can manage a personal movie watchlist.
+Add to watchlist:
+Movies can be added from search results
+Duplicate movies are prevented
+Delete from watchlist:
+Movies can be removed from the watchlist
+State is updated immutably using array filtering
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+4.5 LocalStorage Persistence
+Watchlist data is stored in LocalStorage
+Data persists after page refresh
+Initial state is loaded from LocalStorage on first render
+Hooks used:
+useState
+useEffect
 
-### Deployment
+4.6 Star Rating System
+Users can rate movies using a star-based rating interface
+Ratings are stored per movie
+Ratings are displayed inside the watchlist
+Concepts used:
+Controlled components
+Component state
+Props for parent-child communication
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+4.7 useRef Implementation
+useRef is used for direct DOM interaction and non-rendering values.
+Use cases:
+Automatically focusing the search input
+Preserving mutable values without triggering re-render
 
-### `npm run build` fails to minify
+4.8 State Management
+Multiple React states are used to manage application data and UI flow, including:
+Search query
+Movie list
+Loading status
+Selected movie
+Watchlist
+User rating
+Hooks used:
+useState
+useEffect
+useRef
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+5. Usage
+5.1 Development Mode
+npm start
+Runs the application in development mode
+Hot reload is enabled
+
+5.2 Production Build
+npm run build
+Creates optimized static files in the build directory
+
+6. Development Guidelines
+Use functional components
+Keep components small and reusable
+Separate logic from presentation
+Avoid unnecessary re-renders
+Keep state updates immutable
+
+7. Internal Notes
+
+This project is intended for internal learning purposes
+Documentation should be updated alongside feature changes
+Code clarity is prioritized over optimization
+
+8. Possible Improvements
+Refactor logic into custom hooks
+Improve error and empty state handling
+Add unit testing
+Improve component-level documentation
+Migrate the project to TypeScript
+
+9. Credits
+This project was inspired by a React learning course.
+It was built as part of a personal learning journey, with modifications,
+custom implementations, and feature extensions beyond the original material.
+
+```
